@@ -7,7 +7,8 @@ const API = BASE + COHORT + RESOURCE;
 
 // === State ===
 let party = [];
-let partyDetail;
+let partyDetail = null;
+
 async function getEvent(){
     try {
       const data = await fetch(API);
@@ -20,16 +21,23 @@ async function getEvent(){
 
 }
 
-function partyName(party){
+function partyName(partyObj){
     const $parties = document.createElement('li');
     $parties.innerHTML = `
-        <a href="#selected">${party.name}</a>
+        <a href="#selected">${partyObj.name}</a>
     `;
 
     $parties.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', (event) => {
             document.querySelectorAll('a').forEach(l => l.classList.remove('active'));
             event.target.classList.add('active');
+
+            partyDetail = partyObj;
+            console.log('Selected party:', partyDetail);
+            render();
+            
+            // partyDetail = party.find(partyObj => partyObj.name === event.target.text);
+            // console.log(event.target.text, partyDetail);
         });
 
 });
@@ -67,15 +75,21 @@ $partyDetails.innerHTML = `
 <h2>Party Details</h2>
 <partyDetail></partyDetail>
 `;
-const $addPartyDetails = $partyDetails.querySelector('partyDetail');
-const $partyDetailsData = party.map(partyInfo);
-$partyDetails.replaceChildren(...$partyDetailsData);
+if(partyDetail) {
+$partyData = partyInfo(partyDetail)
+$partyDetails.appendChild($partyData);
+} else {
+    $partyDetails.innerHTML += `<p> Select a party  to see details</p>`
+}
+
 
 return $partyDetails;
+
 }
 
 function render () {
     const $app = document.querySelector("#app");
+
     $app.innerHTML = `
         <h1>Party Planner</h1>
         <section id="content">
